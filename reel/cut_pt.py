@@ -71,8 +71,8 @@ LABEL = "RECONSTITUIÇÃO ARTÍSTICA — NÃO SÃO IMAGENS DE ARQUIVO"
 TEXT = [
     (0.00, 2.60, "QUEM SÃO OS\nVERDADEIROS\nHERÓIS\nDO BRASIL?", T.SERIF, 104, T.WHITE, 0.47, 0.05, 0.0, 0.15, 0.5),
     (2.80, 4.50, "VILA RICA · MINAS GERAIS · SÉCULO XVIII", T.SANS_M, 28, (0.95, 0.85, 0.7), 0.22, 0.2, 0.4, 0.4, 0.0),
-    (5.40, 9.60, "CHICO REI", T.SERIF, 150, T.GOLDC, 0.54, 0.08, 0.5, 0.3, 0.8),
-    (5.90, 9.60, "LIBERDADE, DIGNIDADE,\nRESISTÊNCIA.", T.SANS_B, 50, T.WHITE, 0.635, 0.12, 0.4, 0.3, 0.3),
+    (5.40, 9.60, "CHICO REI", T.SERIF, 150, T.GOLDC, 0.63, 0.08, 0.5, 0.3, 0.8),
+    (5.90, 9.60, "LIBERDADE, DIGNIDADE,\nRESISTÊNCIA.", T.SANS_B, 50, T.WHITE, 0.72, 0.12, 0.4, 0.3, 0.3),
     (7.90, 11.40, "Diz a tradição oral que ele comprou\nsua liberdade com o ouro das minas —\ne ajudou a libertar outros.",
      T.SANS_M, 33, (0.95, 0.9, 0.82), 0.25, 0.0, 0.4, 0.4, 0.0),
     (11.80, 13.30, "FORTALEZA · CEARÁ · 1881", T.SANS_M, 30, T.SEAC, 0.22, 0.22, 0.4, 0.3, 0.0),

@@ -110,18 +110,21 @@ def render_frame(i, with_text=True, t=None):
     t = i / FPS if t is None else t
     t0, t1, fn, cam, grade, flash_in = shot_at(t)
     lt, d = t - t0, t1 - t0
-    img = fn(lt, d, t)
     u = gfx.sm(lt / d) * 0.6 + (lt / d) * 0.4
     z0, z1, cx0, cy0, cx1, cy1 = cam
     z = gfx.lerp(z0, z1, u)
     cx, cy = gfx.lerp(cx0, cx1, u), gfx.lerp(cy0, cy1, u)
     r = np.random.default_rng(i)
     jx, jy = r.normal(0, 0.6, 2)                     # gate weave
-    cw, ch = gfx.w / z, gfx.h / z
-    x0 = min(max(cx * gfx.w - cw / 2 + jx, 0), gfx.w - cw)
-    y0 = min(max(cy * gfx.h - ch / 2 + jy, 0), gfx.h - ch)
-    pil = Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8))
-    f = np.asarray(pil.resize((W, H), Image.BICUBIC, box=(x0, y0, x0 + cw, y0 + ch)), np.float32) / 255.0
+    if getattr(fn, "full_res", False):               # photographic shots frame themselves at output size
+        f = np.clip(fn(lt, d, t, (z, cx, cy, jx, jy)), 0, 1)
+    else:
+        img = fn(lt, d, t)
+        cw, ch = gfx.w / z, gfx.h / z
+        x0 = min(max(cx * gfx.w - cw / 2 + jx, 0), gfx.w - cw)
+        y0 = min(max(cy * gfx.h - ch / 2 + jy, 0), gfx.h - ch)
+        pil = Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8))
+        f = np.asarray(pil.resize((W, H), Image.BICUBIC, box=(x0, y0, x0 + cw, y0 + ch)), np.float32) / 255.0
     gain, tint, contrast = grade
     f = f * gain * np.asarray(tint, np.float32)
     f = np.clip(f, 0, 1)

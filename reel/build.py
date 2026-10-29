@@ -122,18 +122,23 @@ def mux():
     cover()
 
 
-def cover():
-    """Cover image for the Reels grid, with the reel's title."""
+def cover(lang="en"):
+    """Cover for the Reels grid: the Chico Rei photograph with the reel's title,
+    kept inside the centre 3:4 area the profile grid shows."""
     import render
     from PIL import Image
-    f = render.render_frame(int(13.8 * render.FPS), with_text=False).astype(np.float32) / 255
-    f *= 0.75
-    for s, font, size, color, y, tr, glow in (
-            ("BRAZIL’S\nREAL HEROES", T.SERIF, 128, T.GOLDC, 0.50, 0.05, 0.7),
-            ("WERE FIGHTING\nFOR FREEDOM.", T.SANS_B, 66, T.WHITE, 0.64, 0.12, 0.3),
-            ("CHICO REI  ·  DRAGÃO DO MAR", T.SANS_M, 32, (0.9, 0.85, 0.75), 0.73, 0.22, 0.0)):
+    f = render.render_frame(int(12.0 * render.FPS), with_text=False).astype(np.float32) / 255
+    yy = np.linspace(0, 1, f.shape[0], dtype=np.float32)[:, None, None]
+    f *= 1 - 0.55 * np.clip((yy - 0.48) / 0.25, 0, 1)            # darken under the title
+    if lang == "pt":
+        name, lines = "capa_pt.jpg", (("OS VERDADEIROS\nHERÓIS DO BRASIL", T.SERIF, 90, T.GOLDC, 0.62, 0.05, 0.6),
+                                      ("LUTAVAM PELA\nLIBERDADE.", T.SANS_B, 62, T.WHITE, 0.725, 0.12, 0.25))
+    else:
+        name, lines = "cover.jpg", (("BRAZIL’S\nREAL HEROES", T.SERIF, 124, T.GOLDC, 0.62, 0.05, 0.6),
+                                    ("WERE FIGHTING\nFOR FREEDOM.", T.SANS_B, 62, T.WHITE, 0.735, 0.12, 0.25))
+    for s, font, size, color, y, tr, glow in lines + (("CHICO REI  ·  DRAGÃO DO MAR", T.SANS_M, 30, (0.9, 0.85, 0.75), 0.80, 0.22, 0.0),):
         render.draw_text(f, render.text_layer(s, font, size, color, tr, glow), y, 1.0)
-    Image.fromarray((np.clip(f, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, "cover.jpg"), quality=92)
+    Image.fromarray((np.clip(f, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, name), quality=92)
 
 
 if __name__ == "__main__":
@@ -146,3 +151,4 @@ if __name__ == "__main__":
         mux()
     if step == "cover":
         cover()
+        cover("pt")

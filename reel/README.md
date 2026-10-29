@@ -19,6 +19,12 @@ screen says so throughout. That keeps the fictional scenes from being mistaken
 for historical footage and avoids depicting the people's faces or bodies in a
 stereotyped way.
 
+The hero shots of Chico Rei (10.8–15.2 s) and Dragão do Mar (33–38 s), and the final
+close-up, use the photographic portraits in `assets/`, with a slow push-in and dust
+drifting through the light. These are illustrative portraits, not likenesses: no
+portrait of Chico Rei exists, and the image is not the real Francisco José do
+Nascimento. That's why the "artistic reconstruction" label stays on screen.
+
 ## Structure
 
 | Time | Scene | On screen |
@@ -125,7 +131,8 @@ python3 cover_realistic.py pt                                        # Portugues
 | `gfx.py` | Noise textures, silhouettes, jangadas, ships, chains, lighting helpers |
 | `render.py` | Camera, grade, film grain, vignette, flicker, text compositing |
 | `audio.py` | Synthesised score and sound design, timed from the same constants as the picture |
-| `build.py` | Orchestration, loudness normalisation, muxing and cover |
+| `build.py` | Orchestration, loudness normalisation, muxing and covers |
+| `assets/` | Photographic portraits used for the Chico Rei and Dragão do Mar hero shots and the final close-up |
 
 To change wording, timing or the narration text, edit `timeline.py` and run
 `python3 build.py` again.

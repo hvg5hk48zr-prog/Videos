@@ -622,3 +622,66 @@ def modern(lt, d, gt):
 
 def black(lt, d, gt):
     return np.zeros((h, w, 3), np.float32)
+
+
+# ================================================================ photographs
+class Photo:
+    """A still photograph as a shot: Ken Burns framing at output resolution,
+    drifting dust in the light, and a slow breathing of the light shaft."""
+    full_res = True
+    W, H = 1080, 1920
+
+    def __init__(self, path, beam=None, dust=(1.0, 0.85, 0.6), n_dust=500, seed=0):
+        self.path, self.beam, self.dust, self.n, self.seed = path, beam, dust, n_dust, seed
+        self._im = None
+
+    def image(self):
+        if self._im is None:
+            from PIL import Image
+            self._im = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), self.path)).convert("RGB")
+            W, H = self.W, self.H
+            yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+            if self.beam:
+                bx0, by0, bx1, by1, w0, w1 = self.beam
+                dx, dy = (bx1 - bx0) * W, (by1 - by0) * H
+                L = math.hypot(dx, dy)
+                ux, uy = dx / L, dy / L
+                px, py = xx - bx0 * W, yy - by0 * H
+                along = np.clip((px * ux + py * uy) / L, 0, 1)
+                perp = np.abs(-px * uy + py * ux)
+                self._beam = np.exp(-(perp / ((w0 + (w1 - w0) * along) * W)) ** 2) * (1 - along * 0.6)
+            else:
+                self._beam = np.ones((H, W), np.float32) * 0.3
+        return self._im
+
+    def __call__(self, lt, d, gt, cam):
+        from PIL import Image
+        im = self.image()
+        z, cx, cy, jx, jy = cam
+        sw, sh = im.size
+        cw = sw / z
+        ch = cw * self.H / self.W
+        if ch > sh:
+            ch = sh
+            cw = ch * self.W / self.H
+        x0 = min(max(cx * sw - cw / 2 + jx * 0.3, 0), sw - cw)
+        y0 = min(max(cy * sh - ch / 2 + jy * 0.3, 0), sh - ch)
+        f = np.asarray(im.resize((self.W, self.H), Image.LANCZOS, box=(x0, y0, x0 + cw, y0 + ch)), np.float32) / 255
+        breathe = 1 + 0.05 * math.sin(gt * 1.7) + 0.02 * math.sin(gt * 5.3)
+        f = f * (1 + (breathe - 1) * self._beam[..., None])
+        r = np.random.default_rng(self.seed)
+        n = self.n
+        xs = (r.uniform(0, self.W, n) + 12 * lt * r.uniform(-1, 1, n) + 10 * np.sin(lt * r.uniform(0.3, 1.2, n) + r.uniform(0, 6, n))) % self.W
+        ys = (r.uniform(0, self.H, n) + 30 * lt * r.uniform(0.2, 1.0, n)) % self.H
+        v = r.uniform(0.2, 1.0, n) * self._beam[ys.astype(int), xs.astype(int)] * (0.6 + 0.4 * np.sin(lt * 3 + r.uniform(0, 6, n)))
+        buf = np.zeros((self.H, self.W), np.float32)
+        np.add.at(buf, (ys.astype(int), xs.astype(int)), v)
+        f += (blur(buf, 1) * 4.0)[..., None] * col(self.dust)
+        return f
+
+
+import os  # noqa: E402
+
+CHICO_PHOTO = Photo("assets/chico_rei.png", beam=(0.72, 0.0, 0.55, 0.75, 0.08, 0.20), seed=1)
+DRAGAO_PHOTO = Photo("assets/dragao_do_mar.png", beam=(0.50, 0.0, 0.48, 0.45, 0.06, 0.14), dust=(0.9, 0.9, 0.85), n_dust=260, seed=2)
+DRAGAO_CLOSE = Photo("assets/dragao_do_mar.png", beam=(0.50, 0.0, 0.48, 0.45, 0.06, 0.14), dust=(0.9, 0.9, 0.85), n_dust=120, seed=3)
