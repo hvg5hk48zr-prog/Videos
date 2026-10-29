@@ -96,31 +96,54 @@ def heartbeat(amp=1.0):
     return out * amp
 
 
-def clink(f0, dur=0.35, amp=1.0):
+def steel(weight=1.0, dur=0.45, amp=1.0, ring=1.0):
+    """One impact of heavy steel: a noise-excited bank of dense, inharmonic,
+    fast-decaying modes (a clack, not a bell) plus the thud of the mass."""
     t = tt(dur)
     s = np.zeros_like(t)
-    for k, a in ((1.0, 1.0), (2.76, 0.6), (5.40, 0.4), (8.93, 0.25), (13.3, 0.12)):
-        s += a * np.sin(2 * np.pi * f0 * k * t + rng.random() * 6) * np.exp(-t * (8 + k * 4))
-    s += filt(noise(len(t)), 2000, 9000) * env(len(t), 0.0005, 0.006) * 1.5
+    n = 26
+    fs = np.exp(rng.uniform(np.log(180), np.log(5200), n)) * (0.75 + 0.25 / weight)
+    for f in fs:
+        tau = rng.uniform(0.012, 0.07) * ring * (1.0 if f > 900 else 1.6)
+        s += np.sin(2 * np.pi * f * t + rng.random() * 6) * np.exp(-t / tau) / (1 + f / 1800)
+    s = s / n * 6
+    s *= 1 + 0.5 * filt(noise(len(t)), 20, 400)                 # rough, non-periodic ringing
+    s += filt(noise(len(t)), 1200, 9000) * np.exp(-t / 0.004) * 0.9   # contact crack
+    s += filt(noise(len(t)), 150, 1500) * np.exp(-t / 0.02) * 0.6     # body of the link
+    s += np.sin(2 * np.pi * (70 + 40 * np.exp(-t * 40)) * t) * np.exp(-t / 0.035) * 0.7 * weight  # weight
     return s * amp * 0.5
 
 
+def clink(f0, dur=0.35, amp=1.0):
+    """Single link strike (kept for callers); f0 only nudges the weight."""
+    return steel(weight=float(np.clip(1500 / f0, 0.6, 1.6)), dur=max(dur, 0.3), amp=amp)
+
+
 def rattle(n=6, spread=0.45, amp=1.0, base=1700):
-    out = np.zeros(int((spread + 0.5) * SR), np.float32)
-    for _ in range(n):
-        s = clink(base * rng.uniform(0.8, 1.4), 0.3, rng.uniform(0.4, 1.0))
-        i = int(rng.uniform(0, spread) * SR)
-        out[i:i + len(s)] += s
+    """Heavy chain moving: a cluster of link impacts plus links dragging over each other."""
+    L = int((spread + 0.6) * SR)
+    out = np.zeros(L, np.float32)
+    hits = max(8, n * 3)
+    times = np.sort(rng.uniform(0, spread, hits) ** 1.3 / spread ** 0.3)
+    for k, ti in enumerate(times):
+        s = steel(weight=rng.uniform(0.9, 1.5) * 1500 / base * 1.1, dur=0.35, amp=rng.uniform(0.35, 1.0) * (1 - 0.4 * k / hits))
+        i = int(ti * SR)
+        out[i:i + len(s)] += s[:L - i]
+    drag = filt(noise(L), 300, 3500) * np.clip(filt(noise(L), None, 25) * 3, 0, 1)
+    drag *= np.minimum(1, np.arange(L) / (0.03 * SR)) * np.exp(-np.arange(L) / (spread * 0.8 * SR))
+    out += drag * 0.35
+    out += filt(noise(L, "brown"), 30, 200) * np.exp(-np.arange(L) / (0.2 * SR)) * 0.3   # weight on the floor
     return out * amp
 
 
 def metal_hit(amp=1.0, f0=420):
-    t = tt(1.6)
-    s = np.zeros_like(t)
-    for k, a in ((1.0, 1.0), (2.32, 0.7), (4.25, 0.5), (6.63, 0.3), (9.38, 0.2)):
-        s += a * np.sin(2 * np.pi * f0 * k * t) * np.exp(-t * (2.5 + k * 1.5))
-    s += filt(noise(len(t)), 800, 8000) * env(len(t), 0.0005, 0.03) * 1.2
-    return s * amp * 0.5
+    """Heavy iron clang (shackle opening, chain snapping): a big low steel impact
+    with a short, dirty ring and a falling-mass thud."""
+    s = steel(weight=1.7, dur=1.0, amp=1.2, ring=2.2)
+    t = tt(1.0)
+    s += np.sin(2 * np.pi * (55 + 50 * np.exp(-t * 30)) * t) * np.exp(-t / 0.08) * 0.6
+    s += filt(noise(len(t)), 600, 6000) * np.exp(-t / 0.012) * 0.6
+    return s * amp * 0.6
 
 
 def pick_strike(amp=1.0):
@@ -277,7 +300,7 @@ def build(narr_wav, narr_segments, out_path):
     for k in range(int(12 / 0.5)):
         tb = 38.0 + k * 0.5
         sfx.add(tb, drum(0.22 + (0.18 if k % 4 == 0 else 0) + 0.25 * k / 24, 68))
-    for tb in (39.30 + 1.3 * 0.45, 43.90 + 1.3 * 0.5):
+    for tb in (40.60 + 1.1 * 0.45, 43.90 + 1.3 * 0.5):   # chain_break: tb = 0.45 d (0.5 d slow)
         sfx.add(tb - 0.4, whoosh(0.4, 0.4))
         sfx.add(tb, metal_hit(1.0, 520))
         sfx.add(tb, rattle(8, 0.6, 0.6, 1500))

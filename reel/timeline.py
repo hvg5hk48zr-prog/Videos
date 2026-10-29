@@ -29,26 +29,26 @@ SHOTS = [
     (5.00, 8.00, S.mine_workers, C(1.0, 1.10, 0.5, 0.55, 0.48, 0.58), WARM, 1),
     (8.00, 10.80, S.mine_carry, C(1.05, 1.12), WARM, 0),
     (10.80, 15.20, S.CHICO_PHOTO, C(1.0, 1.10, 0.5, 0.5, 0.52, 0.44), PHOTO, 0),
-    (15.20, 17.60, S.gold_hands, C(1.0, 1.12, 0.5, 0.58, 0.5, 0.5), GOLD, 0),
+    (15.20, 17.60, S.CHICO_HANDS, C(1.75, 1.95, 0.62, 0.84, 0.62, 0.82), PHOTO, 0),
     (17.60, 20.00, S.gold_to_freedom, C(1.0, 1.08, 0.5, 0.5, 0.5, 0.45), GOLD, 0),
     # ---- Scene 3: Dragão do Mar
     (20.00, 23.00, S.sea_storm, C(1.0, 1.08, 0.5, 0.55, 0.5, 0.6), STEEL, 1),
     (23.00, 25.00, S.jangada_close, C(1.06, 1.14), STEEL, 0),
     (25.00, 29.00, S.shore_hero, C(1.0, 1.08, 0.5, 0.6, 0.5, 0.55), STEEL, 0),
     (29.00, 33.00, S.line_of_men, C(1.12, 1.0, 0.5, 0.6, 0.5, 0.55), STEEL, 0),
-    (33.00, 38.00, S.DRAGAO_PHOTO, C(1.0, 1.12, 0.5, 0.5, 0.47, 0.44), PHOTO, 1),
+    (33.00, 38.00, S.DRAGAO_PHOTO, C(1.0, 1.12, 0.5, 0.5, 0.45, 0.44), PHOTO, 1),
     # ---- Scene 4: the legacy
     (38.00, 39.30, S.ocean_dawn, C(1.0, 1.06), DAWN, 1),
-    (39.30, 40.60, S.chain_break, C(1.0, 1.06), WARM, 0),
-    (40.60, 41.70, partial(S.face, variant=0), C(1.0, 1.06), WARM, 0),
+    (39.30, 40.60, S.CHICO_FACE, C(1.85, 1.95, 0.48, 0.40, 0.48, 0.39), PHOTO, 0),
+    (40.60, 41.70, S.chain_break, C(1.0, 1.06), WARM, 0),
     (41.70, 42.80, S.sea_storm, C(1.1, 1.16), STEEL, 0),
-    (42.80, 43.90, partial(S.face, variant=1), C(1.0, 1.06), STEEL, 0),
+    (42.80, 43.90, S.DRAGAO_FACE, C(1.85, 1.95, 0.40, 0.41, 0.40, 0.40), PHOTO, 0),
     (43.90, 45.20, partial(S.chain_break, slow=True), C(1.08, 1.14), WARM, 0),
     (45.20, 46.40, S.crowd, C(1.0, 1.05), DAWN, 0),
     (46.40, 47.60, partial(S.face, variant=2), C(1.0, 1.06), WARM, 0),
     (47.60, 50.00, S.modern, C(1.0, 1.08), DAWN, 0),
     # ---- Scene 5: the final question
-    (50.00, 53.20, S.DRAGAO_CLOSE, C(1.45, 1.75, 0.45, 0.42, 0.43, 0.41), PHOTO, 0),
+    (50.00, 53.20, S.DRAGAO_CLOSE, C(1.45, 1.75, 0.42, 0.43, 0.40, 0.41), PHOTO, 0),
     (53.20, 60.00, S.black, C(), NEUTRAL, 0),
 ]
 

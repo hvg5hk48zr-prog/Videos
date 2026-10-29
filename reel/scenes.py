@@ -230,6 +230,12 @@ def gold_to_freedom(lt, d, gt):
     m = c.arr()
     img = comp(img, m, (0.02, 0.012, 0.01))
     img = add(img, shade(m, (0.0, -1.0), 7) * (0.6 + 0.6 * glow), (1.0, 0.8, 0.45))
+    sl = Canvas()                                    # Chico Rei's rough brown linen sleeve, rolled
+    sl.poly([(cx - 0.085 * w, 0.80 * h), (cx + 0.095 * w, 0.79 * h), (cx + 0.13 * w, 1.1 * h), (cx - 0.11 * w, 1.1 * h)])
+    sl.line((cx - 0.09 * w, 0.80 * h), (cx + 0.10 * w, 0.79 * h), 0.025 * h)
+    ms = sl.arr()
+    img = comp(img, ms, col((0.16, 0.10, 0.06)) * (0.35 + 0.25 * ROCK2[..., None]) * glow)
+    img = add(img, shade(ms, (0.0, -1.0), 5) * 0.5 * glow, (0.9, 0.7, 0.45))
     # iron cuff: closed band, then two halves fall away
     mc = Canvas()
     tt = max(0.0, lt - SHACKLE_OPEN)
@@ -437,6 +443,10 @@ def shore_hero(lt, d, gt):
     img = comp(img, far.arr(), (0.10, 0.09, 0.10))
     c = Canvas()
     person(c, 0.5 * w, 0.99 * h, 0.56 * h, 1.08)
+    hh, hx, hy = 0.56 * h, 0.5 * w, 0.99 * h - 0.93 * 0.56 * h       # Dragão: short, tightly curled hair
+    rr = np.random.default_rng(17)
+    for a in np.linspace(math.pi * 1.05, math.pi * 1.95, 16):
+        c.ell(hx + math.cos(a) * 0.055 * hh, hy + math.sin(a) * 0.066 * hh, 0.014 * hh * rr.uniform(0.8, 1.2), 0.014 * hh)
     arrivals = ((0.18, 0.95, 0.47, 0.5, -1), (0.82, 0.96, 0.48, 1.0, 1), (0.04, 0.93, 0.40, 1.6, -1),
                 (0.96, 0.93, 0.41, 2.1, 1))
     for x, yb, hh, t0, side in arrivals:
@@ -631,8 +641,9 @@ class Photo:
     full_res = True
     W, H = 1080, 1920
 
-    def __init__(self, path, beam=None, dust=(1.0, 0.85, 0.6), n_dust=500, seed=0):
+    def __init__(self, path, beam=None, dust=(1.0, 0.85, 0.6), n_dust=500, seed=0, rise=None):
         self.path, self.beam, self.dust, self.n, self.seed = path, beam, dust, n_dust, seed
+        self.rise = rise      # (x, y, spread) in output fractions: gold dust rising from there
         self._im = None
 
     def image(self):
@@ -677,11 +688,30 @@ class Photo:
         buf = np.zeros((self.H, self.W), np.float32)
         np.add.at(buf, (ys.astype(int), xs.astype(int)), v)
         f += (blur(buf, 1) * 4.0)[..., None] * col(self.dust)
+        if self.rise:
+            rx, ry, spread = self.rise
+            n = 700
+            age = (lt * r.uniform(0.15, 0.35, n) + r.random(n)) % 1.0
+            px = rx * self.W + r.normal(0, spread * self.W, n) * (0.5 + age) + np.sin(age * 8 + r.random(n) * 6) * 40 * age
+            py = ry * self.H - age * 0.75 * self.H
+            v = np.sin(age * math.pi) * r.uniform(0.5, 1.4, n) * min(1.0, lt / 0.5)
+            ok = (px >= 0) & (px < self.W) & (py >= 0) & (py < self.H)
+            buf = np.zeros((self.H, self.W), np.float32)
+            np.add.at(buf, (py[ok].astype(int), px[ok].astype(int)), v[ok])
+            f += (blur(buf, 1) * 5.0)[..., None] * col((1.2, 0.85, 0.35))
+            f += (blur(buf, 6) * 40.0)[..., None] * col((1.0, 0.75, 0.35)) * 0.5
+            yy, xx = np.ogrid[0:self.H, 0:self.W]
+            glow = np.exp(-(((xx - rx * self.W) / (0.18 * self.W)) ** 2 + ((yy - ry * self.H) / (0.06 * self.H)) ** 2))
+            f += glow[..., None].astype(np.float32) * col((1.0, 0.7, 0.3)) * 0.35 * min(1.0, lt / 0.5)
         return f
 
 
 import os  # noqa: E402
 
 CHICO_PHOTO = Photo("assets/chico_rei.png", beam=(0.72, 0.0, 0.55, 0.75, 0.08, 0.20), seed=1)
-DRAGAO_PHOTO = Photo("assets/dragao_do_mar.png", beam=(0.50, 0.0, 0.48, 0.45, 0.06, 0.14), dust=(0.9, 0.9, 0.85), n_dust=260, seed=2)
-DRAGAO_CLOSE = Photo("assets/dragao_do_mar.png", beam=(0.50, 0.0, 0.48, 0.45, 0.06, 0.14), dust=(0.9, 0.9, 0.85), n_dust=120, seed=3)
+CHICO_HANDS = Photo("assets/chico_rei.png", beam=(0.72, 0.0, 0.55, 0.75, 0.08, 0.20), n_dust=200, seed=4, rise=(0.58, 0.57, 0.06))
+CHICO_FACE = Photo("assets/chico_rei.png", beam=(0.72, 0.0, 0.55, 0.75, 0.08, 0.20), n_dust=150, seed=5)
+_DRAGAO_BEAM = (0.42, 0.03, 0.36, 0.32, 0.05, 0.10)
+DRAGAO_PHOTO = Photo("assets/dragao_do_mar.jpg", beam=_DRAGAO_BEAM, dust=(1.0, 0.9, 0.75), n_dust=260, seed=2)
+DRAGAO_FACE = Photo("assets/dragao_do_mar.jpg", beam=_DRAGAO_BEAM, dust=(1.0, 0.9, 0.75), n_dust=120, seed=6)
+DRAGAO_CLOSE = Photo("assets/dragao_do_mar.jpg", beam=_DRAGAO_BEAM, dust=(1.0, 0.9, 0.75), n_dust=120, seed=3)

@@ -82,7 +82,7 @@ TEXT = [
     (19.50, 22.60, "DRAGÃO\nDO MAR", T.SERIF, 150, T.SEAC, 0.585, 0.08, 0.4, 0.25, 0.7),
     (20.20, 22.60, "O HOMEM QUE DISSE NÃO.", T.SANS_B, 50, T.WHITE, 0.71, 0.12, 0.4, 0.25, 0.3),
     (20.80, 22.50, "Francisco José do Nascimento", T.SANS_M, 32, (0.85, 0.9, 0.95), 0.755, 0.04, 0.4, 0.3, 0.0),
-    (35.80, 37.40, "QUEM\nCHAMAMOS\nDE HERÓI?", T.SERIF, 112, T.WHITE, 0.46, 0.06, 0.4, 0.25, 0.5),
+    (35.80, 37.40, "QUEM\nCHAMAMOS\nDE HERÓI?", T.SERIF, 96, T.WHITE, 0.73, 0.06, 0.4, 0.25, 0.5),
     (37.75, 40.00, "LEMBRE-SE\nDE QUEM\nLUTOU PELA\nLIBERDADE.", T.SERIF, 100, T.GOLDC, 0.46, 0.06, 0.4, 0.0, 0.6),
     (38.40, 40.00, "CHICO REI  ·  DRAGÃO DO MAR", T.SANS_M, 30, (0.85, 0.8, 0.7), 0.71, 0.24, 0.4, 0.0, 0.0),
     (2.60, 35.60, LABEL, T.SANS_M, 19, (0.8, 0.8, 0.8), 0.115, 0.18, 0.5, 0.3, 0.0),
@@ -209,7 +209,7 @@ def score(narr_wav, segs, path):
     music.add(32.1, A.pad(3.5, [29, 41, 48, 53, 57, 60, 65], 0.85, a=0.3, r=0.0, bright=10, vib=0.002))
     for k in range(int(13.0 / 0.5)):
         sfx.add(22.6 + k * 0.5, A.drum(0.22 + (0.18 if k % 4 == 0 else 0) + 0.25 * k / 26, 68))
-    for tb in (out_time(39.3 + 1.3 * 0.45), out_time(43.9 + 1.3 * 0.5)):
+    for tb in (out_time(40.6 + 1.1 * 0.45), out_time(43.9 + 1.3 * 0.5)):
         sfx.add(tb - 0.4, A.whoosh(0.4, 0.4))
         sfx.add(tb, A.metal_hit(1.0, 520))
         sfx.add(tb, A.rattle(8, 0.6, 0.6, 1500))
