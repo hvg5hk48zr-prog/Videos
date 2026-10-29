@@ -14,7 +14,11 @@ import timeline as T
 W, H = 1080, 1920
 SS = 3
 YY, XX = np.mgrid[0:H, 0:W].astype(np.float32)
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "cover_realistic.jpg")
+OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
+TITLES = {
+    "en": ("cover_realistic.jpg", "BRAZIL’S\nREAL HEROES", "WERE FIGHTING\nFOR FREEDOM."),
+    "pt": ("capa_realista_pt.jpg", "OS VERDADEIROS\nHERÓIS DO BRASIL", "LUTAVAM PELA\nLIBERDADE."),
+}
 
 
 def catmull(pts, n=12, closed=True):
@@ -85,7 +89,8 @@ def fbm(a, seed, ax=1.0):
     return gfx.fbm(H, W, a, seed, ax=ax)
 
 
-def main():
+def main(lang="en"):
+    name, title, sub = TITLES[lang]
     cx, cy, s, tilt = 0.30 * W, 0.30 * H, 0.215 * H, -0.20
     L = np.array([0.82, -0.57])                      # toward the light shaft (upper right)
 
@@ -179,13 +184,15 @@ def main():
     img += render.GRAIN[0] * 0.035
     img *= 0.85
     for txt, font, size, color, y, tr, glow in (
-            ("BRAZIL’S\nREAL HEROES", T.SERIF, 128, T.GOLDC, 0.56, 0.05, 0.6),
-            ("WERE FIGHTING\nFOR FREEDOM.", T.SANS_B, 66, T.WHITE, 0.695, 0.12, 0.25),
+            (title, T.SERIF, 128 if lang == "en" else 104, T.GOLDC, 0.56, 0.05, 0.6),
+            (sub, T.SANS_B, 66, T.WHITE, 0.695, 0.12, 0.25),
             ("CHICO REI  ·  DRAGÃO DO MAR", T.SANS_M, 32, (0.9, 0.85, 0.75), 0.775, 0.22, 0.0)):
         render.draw_text(img, render.text_layer(txt, font, size, color, tr, glow), y, 1.0)
-    Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8)).save(OUT, quality=93)
-    print(OUT)
+    out = os.path.join(OUT_DIR, name)
+    Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8)).save(out, quality=93)
+    print(out)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(sys.argv[1] if len(sys.argv) > 1 else "en")

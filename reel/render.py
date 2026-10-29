@@ -106,8 +106,8 @@ def shot_at(t):
     return T.SHOTS[-1]
 
 
-def render_frame(i, with_text=True):
-    t = i / FPS
+def render_frame(i, with_text=True, t=None):
+    t = i / FPS if t is None else t
     t0, t1, fn, cam, grade, flash_in = shot_at(t)
     lt, d = t - t0, t1 - t0
     img = fn(lt, d, t)
