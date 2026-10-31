@@ -1,7 +1,7 @@
 # Plano de Aulas de Capoeira: 3 meses para iniciantes
 
-**Formato:** 2 aulas por semana, 1h cada, 12 semanas (24 aulas)
-**Público:** alunos iniciantes
+**Formato:** 2 aulas por semana, 1h cada, 12 semanas (24 aulas)\
+**Público:** alunos iniciantes\
 **Base:** os golpes e sequências enviados pelo professor, reorganizados do mais simples para o mais complexo
 
 ---
