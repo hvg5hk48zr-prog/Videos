@@ -38,3 +38,14 @@ Your captions are carried onto the B-roll. `audio` mixes in the clip's sound at 
 
 Requirements: `ffmpeg`, `pip install opencv-python-headless pillow numpy`. Re-run
 `analyze.py` to OCR the caption timeline if you swap the source video.
+
+## Portuguese subtitles
+
+`out/sao_bento_grande_legendas_pt.mp4` is the version with your own images and clips. The English
+captions are removed and Portuguese ones put in their place, in the same style (Fraunces Black, blue with
+a white outline; font in `fonts/`, OFL licence). The audio stays English.
+
+    python3 analyze.py SOURCE.mp4 caps.json
+    python3 subtitles_pt.py SOURCE.mp4 caps.json out/sao_bento_grande_legendas_pt.mp4
+
+Edit `SEGMENTS` in `subtitles_pt.py` to change the wording or timing.
