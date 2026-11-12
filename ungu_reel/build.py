@@ -77,10 +77,13 @@ def handle_layer():
 def end_card():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    y = 560
-    d.text((W // 2, y), "BEGINNERS", font=font(170), fill=YELLOW, anchor="ma")
-    d.text((W // 2, y + 170), "WELCOME", font=font(170), fill=YELLOW, anchor="ma")
-    y += 400
+    y = 470
+    d.text((W // 2, y), "BEGINNERS WELCOME", font=font(84), fill=WHITE, anchor="ma")
+    y += 130
+    d.text((W // 2, y), "FIRST CLASS", font=font(150), fill=YELLOW, anchor="ma")
+    d.text((W // 2, y + 150), "FREE", font=font(300), fill=YELLOW, anchor="ma")
+    y -= 40
+    y += 530
     d.rectangle((W // 2 - 150, y, W // 2, y + 10), fill=GREEN)
     d.rectangle((W // 2, y, W // 2 + 150, y + 10), fill=YELLOW)
     y += 60
@@ -92,7 +95,7 @@ def end_card():
     d.rounded_rectangle((W // 2 - tw // 2 - 44, y - 22, W // 2 + tw // 2 + 44, y + 88),
                         radius=55, fill=WHITE)
     d.text((W // 2, y), HANDLE, font=f, fill=(15, 15, 15), anchor="ma")
-    d.text((W // 2, y + 140), "DM us to start", font=font(56, FONT_B), fill=WHITE, anchor="ma")
+    d.text((W // 2, y + 140), "DM us to book yours", font=font(56, FONT_B), fill=WHITE, anchor="ma")
     return img
 
 
